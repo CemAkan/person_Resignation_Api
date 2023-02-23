@@ -16,3 +16,10 @@ dataBase.sequelize.sync().then(() => {
     console.log("Working on port: " + PORT);
   });
 });
+
+// --> get request <--
+app.get("/resignation", (req, res) => {
+  dataBase.Person.findAll().then((resign) => {
+    res.json(resign);
+  });
+});
