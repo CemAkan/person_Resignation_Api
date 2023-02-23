@@ -81,3 +81,26 @@ app.put("/resignation/:id", (req, res) => {
     }
   );
 });
+
+// --> delete request <--
+app.delete("/resignation/:id", (req, res) => {
+  let personId = req.params.id;
+  dataBase.Person.destroy({
+    where: {
+      id: personId,
+    },
+  }).then(
+    (rowdeleted) => {
+      if (rowdeleted === 0) {
+        res.status(404).send({
+          error: "Person can not found.",
+        });
+      } else {
+        res.status(204).send();
+      }
+    },
+    () => {
+      res.status(500).send();
+    }
+  );
+});
