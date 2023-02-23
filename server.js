@@ -36,3 +36,48 @@ app.post("/resignation", (req, res) => {
       });
     };
 });
+
+// --> put request <--
+app.put("/resignation/:id", (req, res) => {
+  let personId = req.params.id;
+  let body = _.pick(req.body, "username", "email", "password");
+  let attributes = {};
+
+  if (body.hasOwnProperty("username")) {
+    attributes.username = body.username;
+  }
+
+  if (body.hasOwnProperty("email")) {
+    attributes.email = body.email;
+  }
+
+  if (body.hasOwnProperty("password")) {
+    attributes.password = body.password;
+  }
+
+  dataBase.Person.findOne({
+    where: {
+      id: personId,
+    },
+  }).then(
+    (resign) => {
+      if (resign) {
+        resign.update(attributes).then(
+          (resign) => {
+            res.json(resign);
+          },
+          () => {
+            res.status(400).send();
+          }
+        );
+      } else {
+        res.status(404).send({
+          error: "Person can not found.",
+        });
+      }
+    },
+    () => {
+      res.status(500).send();
+    }
+  );
+});
