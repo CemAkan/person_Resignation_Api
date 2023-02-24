@@ -52,14 +52,16 @@ app.get("/resignation", (req, res) => {
 // --> post request <--
 app.post("/resignation", (req, res) => {
   let body = _.pick(req.body, "username", "email", "password");
-  dataBase.Person.create(body).then((resign) => {
-    res.json(resign);
-  }),
-    () => {
+  dataBase.Person.create(body).then(
+    (resign) => {
+      res.json(resign);
+    },
+    (err) => {
       res.status(400).send({
         error: "Please use correct writing rules.",
       });
-    };
+    }
+  );
 });
 
 // --> put request <--
