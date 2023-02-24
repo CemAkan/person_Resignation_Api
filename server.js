@@ -7,24 +7,24 @@ require("dotenv").config();
 
 var PORT = process.env.PORT;
 
-// --> Data Base Connection <--
+// --> Database Connection <--
 var dataBase = require("./connect.js");
 
-// --> Open a Port <--
+// --> Opening a Port <--
 dataBase.sequelize.sync().then(() => {
   app.listen(PORT, () => {
     console.log("Working on port: " + PORT);
   });
 });
 
-// --> get request <--
+// --> Get request <--
 app.get("/resignation", (req, res) => {
   dataBase.Person.findAll().then((resign) => {
     res.json(resign);
   });
 });
 
-// --> post request <--
+// --> Post request <--
 app.post("/resignation", (req, res) => {
   let body = _.pick(req.body, "username", "email", "password");
   dataBase.Person.create(body).then((resign) => {
@@ -37,7 +37,7 @@ app.post("/resignation", (req, res) => {
     };
 });
 
-// --> put request <--
+// --> Put request <--
 app.put("/resignation/:id", (req, res) => {
   let personId = req.params.id;
   let body = _.pick(req.body, "username", "email", "password");
