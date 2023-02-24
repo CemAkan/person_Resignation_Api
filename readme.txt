@@ -7,7 +7,7 @@ parameters: {username [between 1 and 10 characters], email [format: email], pass
 
 SIGN IN
 method: GET
-endPoint: /users/sign-in
+endPoint: /resignation
 parameters: {username [between 1 and 10 characters], password [between 8 and 20 characters]}
 
 EDIT PROFILE
