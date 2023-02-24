@@ -17,40 +17,40 @@ dataBase.sequelize.sync().then(() => {
   });
 });
 
-// --> get request <--
+// --> sign-in <--
 app.get("/resignation", (req, res) => {
   let body = _.pick(req.body, "username", "password");
-
-  // --> login <--
-  if (Object.keys(body).length != 0) {
-    dataBase.Person.findOne({
-      where: {
-        username: body.username,
-        password: body.password,
-      },
-      //--> login chech <--
-    }).then((todos) => {
-      if (todos != null) {
-        res.send("You succesfully logined.");
-      } else {
-        res.send("You can not login, please try again.");
-      }
-    }),
-      () => {
-        res.status(404).send({
-          error: "You can not login, please try again.",
-        });
-      };
-    //--> list all <--
-  } else {
-    dataBase.Person.findAll().then((resign) => {
-      res.json(resign);
-    });
-  }
+  dataBase.Person.findOne({
+    where: {
+      username: body.username,
+      password: body.password,
+    },
+    //--> login chech <--
+  }).then((todos) => {
+    if (todos != null) {
+      res.send("You succesfully logined.");
+    } else {
+      res.send("You can not login, please try again.");
+    }
+  }),
+    () => {
+      res.status(404).send({
+        error: "You can not login, please try again.",
+      });
+    };
 });
 
-// --> post request <--
-app.post("/resignation", (req, res) => {
+//--> list all <--
+app.get("/users/list", (req, res) => {
+  let body = _.pick(req.body, "username", "password");
+
+  dataBase.Person.findAll().then((resign) => {
+    res.json(resign);
+  });
+});
+
+// --> sign-up <--
+app.post("/users/sign-up", (req, res) => {
   let body = _.pick(req.body, "username", "email", "password");
   dataBase.Person.create(body).then(
     (resign) => {
@@ -64,8 +64,8 @@ app.post("/resignation", (req, res) => {
   );
 });
 
-// --> put request <--
-app.put("/resignation/:id", (req, res) => {
+// --> update profile <--
+app.put("/users/update-profile/:id", (req, res) => {
   let personId = req.params.id;
   let body = _.pick(req.body, "username", "email", "password");
   let attributes = {};
@@ -109,8 +109,8 @@ app.put("/resignation/:id", (req, res) => {
   );
 });
 
-// --> delete request <--
-app.delete("/resignation/:id", (req, res) => {
+// --> delete profile <--
+app.delete("/delete-profile/:id", (req, res) => {
   let personId = req.params.id;
   dataBase.Person.destroy({
     where: {
