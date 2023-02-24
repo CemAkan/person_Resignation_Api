@@ -3,6 +3,7 @@ var app = express();
 var bodyParser = require("body-parser");
 app.use(bodyParser.json());
 var _ = require("underscore");
+const crypto = require("crypto");
 require("dotenv").config();
 
 var PORT = process.env.PORT;
@@ -17,13 +18,20 @@ dataBase.sequelize.sync().then(() => {
   });
 });
 
+// --> cyrpto <--
+const hashAlgo = "sha256";
+
 // --> sign-in <--
-app.get("/resignation", (req, res) => {
+app.post("/users/sign-in", (req, res) => {
   let body = _.pick(req.body, "username", "password");
+
+  //--> part of encrypting the password <--
+  const text = body.password;
+  const hash = crypto.createHash(hashAlgo).update(text).digest("hex");
   dataBase.Person.findOne({
     where: {
       username: body.username,
-      password: body.password,
+      password: hash,
     },
     //--> login chech <--
   }).then((todos) => {
@@ -52,16 +60,26 @@ app.get("/users/list", (req, res) => {
 // --> sign-up <--
 app.post("/users/sign-up", (req, res) => {
   let body = _.pick(req.body, "username", "email", "password");
-  dataBase.Person.create(body).then(
-    (resign) => {
-      res.json(resign);
-    },
-    (err) => {
-      res.status(400).send({
-        error: "Please use correct writing rules.",
-      });
-    }
-  );
+
+  //--> part of encrypting the password <--
+  const text = body.password;
+  const hash = crypto.createHash(hashAlgo).update(text).digest("hex");
+  body.password = hash;
+  //--> password length check <--
+  if (text.length < 8) {
+    res.send("Please use a long password.");
+  } else {
+    dataBase.Person.create(body).then(
+      (resign) => {
+        res.json(resign);
+      },
+      (err) => {
+        res.status(400).send({
+          error: "Please use correct writing rules.",
+        });
+      }
+    );
+  }
 });
 
 // --> update profile <--
@@ -110,7 +128,7 @@ app.put("/users/update-profile/:id", (req, res) => {
 });
 
 // --> delete profile <--
-app.delete("/delete-profile/:id", (req, res) => {
+app.delete("/users/delete-profile/:id", (req, res) => {
   let personId = req.params.id;
   dataBase.Person.destroy({
     where: {
