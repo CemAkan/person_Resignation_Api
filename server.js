@@ -19,9 +19,34 @@ dataBase.sequelize.sync().then(() => {
 
 // --> get request <--
 app.get("/resignation", (req, res) => {
-  dataBase.Person.findAll().then((resign) => {
-    res.json(resign);
-  });
+  let body = _.pick(req.body, "username", "password");
+
+  // --> login <--
+  if (Object.keys(body).length != 0) {
+    dataBase.Person.findOne({
+      where: {
+        username: body.username,
+        password: body.password,
+      },
+      //--> login chech <--
+    }).then((todos) => {
+      if (todos != null) {
+        res.send("You succesfully logined.");
+      } else {
+        res.send("You can not login, please try again.");
+      }
+    }),
+      () => {
+        res.status(404).send({
+          error: "You can not login, please try again.",
+        });
+      };
+    //--> list all <--
+  } else {
+    dataBase.Person.findAll().then((resign) => {
+      res.json(resign);
+    });
+  }
 });
 
 // --> post request <--
